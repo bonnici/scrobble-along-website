@@ -13,7 +13,7 @@ var pages = require('./routes/pages');
 var api = require('./routes/api');
 
 // Required environment variables
-var PORT = process.env.SA_PORT;
+var PORT = process.env.PORT;
 var NODE_ENV = process.env.NODE_ENV;
 var BASE_URL = process.env.SA_BASE_URL;
 var LASTFM_API_KEY = process.env.SA_LASTFM_API_KEY;

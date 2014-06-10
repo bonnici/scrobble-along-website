@@ -4,7 +4,8 @@ ScrobbleAlong Website
 This is a website that shows information about what some radio stations are playing and allows people to scrobble along with them on [last.fm](http://last.fm/). There is also a backend repository [here](https://github.com/bonnici/scrobble-along-scrobbler) to get that information. The site should be up and running [here](http://scrobblealong.com).
 
 The site requires a few environment variables:
-* SA_PORT: The port to run the website on
+* PORT: The port to run the website on
+* NODE_ENV: 'production' or 'development'
 * SA_BASE_URL: Base URL of the port (e.g. http://scrobblealong.com)
 * SA_LASTFM_API_KEY: Last.fm API key (should match scrobble-along-scrobbler)
 * SA_LASTFM_SECRET: Last.fm API secret (should match scrobble-along-scrobbler)
