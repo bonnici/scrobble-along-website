@@ -83,7 +83,9 @@ var LastFmDao = (function () {
 			handlers: {
 				success: function(data) {
 					if (!data || !data.recenttracks || !data.recenttracks.track) {
-						callback("Invalid data returned from request");
+						// Only log error, do not pass back error in callback so that async.map will continue with other requests
+						winston.error('getRecentTracks invalid data', data);
+						callback(null, null);
 						return;
 					}
 
@@ -103,8 +105,9 @@ var LastFmDao = (function () {
 					callback(null, tracks);
 				},
 				error: function(err) {
+					// Only log error, do not pass back error in callback so that async.map will continue with other requests
 					winston.error('getRecentTracks error', err);
-					callback(err, null);
+					callback(null, null);
 				}
 			}
 		});
@@ -127,8 +130,9 @@ var LastFmDao = (function () {
 					}
 				},
 				error: function(err) {
+					// Only log error, do not pass back error in callback so that async.map will continue with other requests
 					winston.error('getTasteometer error', err);
-					callback(err, null);
+					callback(null, 0);
 				}
 			}
 		});
