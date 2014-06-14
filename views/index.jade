@@ -1,7 +1,7 @@
 extends layout
 
 block body
-	div(data-ng-controller='IndexCtrl', data-ng-show="loaded")
+	div.ng-hide(data-ng-controller='IndexCtrl', data-ng-show="loaded")
 
 		div.alert.alert-danger(data-ng-if='alertMessage') {{ alertMessage }}
 
