@@ -78,11 +78,14 @@ angular.module('scrobbleAlong.services', []).
 
 	factory('stationDetails', ['baseApi', function(baseApi) {
 
-		var getApiBatch = function(batchSize, url, stationNames, username, details, callback) {
+		// Updates the stations details in batches, callback is called when everything is done
+		var getApiBatch = function(batchSize, url, stationNames, username, stations, callback) {
 			if (stationNames.length == 0) {
 				callback();
 				return;
 			}
+
+			stationNames = stationNames.slice(0); // Clone array so we can splice it safely
 
 			var batch = stationNames.splice(0, batchSize);
 			var params = { stations: batch.join(",") };
@@ -91,8 +94,13 @@ angular.module('scrobbleAlong.services', []).
 			}
 
 			baseApi.getApiUrl(url, params, function(data) {
-				angular.extend(details, data);
-				getApiBatch(batchSize, url, stationNames, username, details, callback);
+				angular.forEach(stations, function(station) {
+					if (station.lastfmUsername in data) {
+						angular.extend(station, data[station.lastfmUsername]);
+					}
+				});
+
+				getApiBatch(batchSize, url, stationNames, username, stations, callback);
 			});
 		};
 
@@ -106,42 +114,32 @@ angular.module('scrobbleAlong.services', []).
 			},
 
 			// Returns a map of station name to last.fm details (profile pic) in the callback
-			getStationsLfmInfo: function(stationNames, callback) {
+			getStationsLfmInfo: function(stationNames, results, callback) {
 				if (!stationNames || stationNames.length == 0) {
-					callback({});
+					if (callback) callback();
+					return;
 				}
 
-				stationNames = stationNames.slice(0); // Clone array so we can splice it safely
-				var details = {};
-				getApiBatch(10, 'station-lastfm-info', stationNames, null, details, function() {
-					callback(details);
-				});
+				getApiBatch(10, 'station-lastfm-info', stationNames, null, results, callback);
 			},
 
 			// Returns a map of station name to tasteometer scores in the callback
-			getStationsTasteometer: function(stationNames, username, callback) {
+			getStationsTasteometer: function(stationNames, username, results, callback) {
 				if (!stationNames || stationNames.length == 0 || !username) {
-					callback({});
+					if (callback) callback();
+					return;
 				}
 
-				stationNames = stationNames.slice(0); // Clone array so we can splice it safely
-				var details = {};
-				getApiBatch(10, 'station-lastfm-tasteometer', stationNames, username, details, function() {
-					callback(details);
-				});
+				getApiBatch(10, 'station-lastfm-tasteometer', stationNames, username, results, callback);
 			},
 
-			// Returns a map of station name to recent track array in the callback
-			getStationsRecentTracks: function(stationNames, callback) {
+			getStationsRecentTracks: function(stationNames, results, callback) {
 				if (!stationNames || stationNames.length == 0) {
-					callback({});
+					if (callback) callback();
+					return;
 				}
 
-				stationNames = stationNames.slice(0); // Clone array so we can splice it safely
-				var details = {};
-				getApiBatch(5, 'station-lastfm-recenttracks', stationNames, null, details, function() {
-					callback(details);
-				});
+				getApiBatch(5, 'station-lastfm-recenttracks', stationNames, null, results, callback);
 			}
 		};
 

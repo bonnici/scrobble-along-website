@@ -7,6 +7,7 @@ angular.module('scrobbleAlong.controllers', []).
 	controller('LoginCtrl', ['$scope', '$cookies', '$window', 'userManagement', function($scope, $cookies, $window, userManagement) {
 		$scope.loggedIn = $cookies.lastfmSession ? true : false;
 		$scope.userDetails = { isScrobbling: false };
+		$scope.loaded = true;
 
 		userManagement.getLoginUrl(function(url) {
 			$scope.loginUrl = url;
@@ -39,15 +40,7 @@ angular.module('scrobbleAlong.controllers', []).
 				stationNames.push(station.lastfmUsername);
 			});
 
-			stationDetailsSvc.getStationsRecentTracks(stationNames, function(stationsRecentTracks) {
-				if (stationsRecentTracks) {
-					angular.forEach($scope.stations, function(station) {
-						if (station.lastfmUsername in stationsRecentTracks) {
-							station.recentTracks = stationsRecentTracks[station.lastfmUsername];
-						}
-					});
-				}
-
+			stationDetailsSvc.getStationsRecentTracks(stationNames, $scope.stations, function() {
 				$timeout(function() { updateStationsRecentTracks(); }, 20 * 1000);
 			});
 		};
@@ -87,24 +80,8 @@ angular.module('scrobbleAlong.controllers', []).
 					}
 				});
 
-				stationDetailsSvc.getStationsLfmInfo(stationNames, function(stationsLfmInfo) {
-					if (stationsLfmInfo) {
-						angular.forEach($scope.stations, function(station) {
-							angular.extend(station, stationsLfmInfo[station.lastfmUsername]);
-						});
-					}
-				});
-
-				stationDetailsSvc.getStationsTasteometer(stationNames, $scope.userDetails.lastfmUsername, function(stationsTasteometer) {
-					if (stationsTasteometer) {
-						angular.forEach($scope.stations, function(station) {
-							if (station.lastfmUsername in stationsTasteometer) {
-								station.tasteometer = stationsTasteometer[station.lastfmUsername] || 0;
-							}
-						});
-					}
-				});
-
+				stationDetailsSvc.getStationsLfmInfo(stationNames, $scope.stations);
+				stationDetailsSvc.getStationsTasteometer(stationNames, $scope.userDetails.lastfmUsername, $scope.stations);
 				updateStationsRecentTracks(); // Fires a timeout to re-update later
 			});
 		});

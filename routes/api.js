@@ -78,7 +78,7 @@ var cacheRespond = function(key, expires, res, callback) {
 };
 
 exports.stations = function (req, res) {
-	cacheRespond("all-stations", 60*60, res, function(updateCallback) {
+	cacheRespond("all-stations", 12*60*60, res, function(updateCallback) {
 		mongoDao.getStations(function (err, stationArray) {
 			if (err) {
 				winston.error("Error loading stations:", err);
@@ -113,7 +113,7 @@ exports.userLastfmInfo = function(req, res) {
 		return;
 	}
 
-	cacheRespond("user-lastfm-" + req.query.user, 60*60, res, function(updateCallback) {
+	cacheRespond("user-lastfm-" + req.query.user, 12*60*60, res, function(updateCallback) {
 		lastfmDao.getUserInfo(req.query.user, function(err, details) {
 			if (err || !details.lastfmProfileImage) {
 				winston.error("Error getting user info for user:", err);
@@ -140,7 +140,7 @@ exports.stationLastfmInfo = function(req, res) {
 		return;
 	}
 
-	cacheRespond("station-lastfm-info-" + req.query.stations, 60*60, res, function(updateCallback) {
+	cacheRespond("station-lastfm-info-v2-" + req.query.stations, 12*60*60, res, function(updateCallback) {
 		var stationDetails = {};
 		async.map(stations, lastfmDao.getUserInfo, function(err, results) {
 			if (err) {
@@ -175,7 +175,7 @@ exports.stationLastfmTasteometer = function(req, res) {
 		return;
 	}
 
-	cacheRespond("station-lastfm-tasteometer-" + req.query.user + "-" + req.query.stations, 60*60, res, function(updateCallback) {
+	cacheRespond("station-lastfm-tasteometer-v2-" + req.query.user + "-" + req.query.stations, 12*60*60, res, function(updateCallback) {
 		var tasteometerData = [];
 		_.each(stations, function(station) {
 			tasteometerData.push({ user1: req.query.user, user2: station });
@@ -190,7 +190,7 @@ exports.stationLastfmTasteometer = function(req, res) {
 			}
 
 			for (var i=0; i < tasteometerData.length; i++) {
-				tasteometerResults[tasteometerData[i].user2] = results[i] * 100; // convert to percentage
+				tasteometerResults[tasteometerData[i].user2] = { tasteometer: results[i] * 100 }; // convert to percentage
 			}
 
 			updateCallback(tasteometerResults);
@@ -211,21 +211,33 @@ exports.stationLastfmRecentTracks = function(req, res) {
 		return;
 	}
 
-	cacheRespond("station-lastfm-recenttracks-" + req.query.stations, 19, res, function(updateCallback) {
-		var recentTracks = {};
+	cacheRespond("station-lastfm-recenttracks-v2-" + req.query.stations, 20, res, function(updateCallback) {
+		var recentTrackResults = {};
 		async.map(stations, lastfmDao.getRecentTracks, function(err, results) {
-			if (err || results.length != stations.length) {
+			if (err && (!results || results.length == 0)) {
 				winston.error("Error getting recent tracks:", err);
 				res.status(500).send('Unexpected results while getting station\'s recent tracks');
 				return;
 			}
 
+			var successCount = 0;
 			for (var i=0; i < stations.length; i++) {
-				recentTracks[stations[i]] = results[i];
+				if (results[i]) {
+					recentTrackResults[stations[i]] = { recentTracks: results[i] };
+					successCount++;
+				}
 			}
 
-			updateCallback(recentTracks);
-			res.json(recentTracks);
+			// Only update cache if we got all stations back
+			if (successCount == stations.length) {
+				updateCallback(recentTrackResults);
+			}
+			else {
+				winston.warn("Did not get recent tracks for all stations in request, expected " + stations.length
+					+ " but got " + successCount);
+			}
+
+			res.json(recentTrackResults);
 		});
 	});
 };

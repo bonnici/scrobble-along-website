@@ -1,4 +1,5 @@
 var _ = require("underscore");
+var winston = require("winston");
 
 var LastFmDao = (function () {
 	var lastfmNode;
@@ -20,6 +21,7 @@ var LastFmDao = (function () {
 					return;
 				},
 				error: function(error) {
+					winston.error('getSession error', error);
 					callback(error, null);
 					return;
 				}
@@ -44,6 +46,7 @@ var LastFmDao = (function () {
 					callback(null, { lastfmProfileImage: lastfmProfileImage });
 				},
 				error: function(err) {
+					winston.error('getUserInfo error', err);
 					callback(err, null);
 				}
 			}
@@ -72,12 +75,11 @@ var LastFmDao = (function () {
 		return null;
 	};
 
-	// Returns 5 most recent tracks, not including duplicate now playing/last played
+	// Returns 3 most recent tracks, not including duplicate now playing/last played
 	LastFmDao.prototype.getRecentTracks = function (username, callback) {
-
 		lastfmNode.request("user.getRecentTracks", {
 			user: username,
-			limit: "6", // 5 plus possible duplicate
+			limit: "4", // 3 plus possible duplicate
 			handlers: {
 				success: function(data) {
 					if (!data || !data.recenttracks || !data.recenttracks.track) {
@@ -101,6 +103,7 @@ var LastFmDao = (function () {
 					callback(null, tracks);
 				},
 				error: function(err) {
+					winston.error('getRecentTracks error', err);
 					callback(err, null);
 				}
 			}
@@ -124,6 +127,7 @@ var LastFmDao = (function () {
 					}
 				},
 				error: function(err) {
+					winston.error('getTasteometer error', err);
 					callback(err, null);
 				}
 			}
