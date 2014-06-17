@@ -123,8 +123,9 @@ mongodb.connect(MONGO_URI, function (err, dbClient) {
 
 /*
 todo
-deploy & test - check logs on site and server
- - make 2 separate submodules, use git to deploy website submodule
 
-time out scrobbling
+contact soma about the block, transfer ownership?
+option to time out scrobbling automatically after a while
+store recent tracks in mongo (?)
+better UI
 */

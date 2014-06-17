@@ -8,8 +8,8 @@
 			<img data-ng-if="!station.lastfmProfileImage" src="/img/ajax-loader.gif" class="loading">
 		</div>
 		<div class="buttons">
-			<button data-ng-if="!station.currentlyScrobbling" class="btn btn-xs btn-success" data-ng-click="scrobbleAlong(station)">Scrobble Along</button>
-			<button data-ng-if="station.currentlyScrobbling" class="btn btn-xs btn-default" data-ng-click="stopScrobbling(station)">Stop Scrobbling</button>
+			<button data-ng-if="loggedIn && !station.currentlyScrobbling" class="btn btn-xs btn-success" data-ng-click="scrobbleAlong(station)">Scrobble Along</button>
+			<button data-ng-if="loggedIn && station.currentlyScrobbling" class="btn btn-xs btn-default" data-ng-click="stopScrobbling(station)">Stop Scrobbling</button>
 		</div>
 	</div>
 	<div class="station-info">

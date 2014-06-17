@@ -19,7 +19,7 @@ block body
 			div#user-info
 				div.user-tile(user-tile)
 				div.station-tile(data-ng-repeat='station in stations | filter:{currentlyScrobbling:true}', station-tile)
-				p#continue-scrobbling-note Note: ScrobbleAlong will continue scrobbling even if you close your browser window.
+				p#continue-scrobbling-note(data-ng-if='userDetails.isScrobbling') Note: ScrobbleAlong will continue scrobbling even if you close your browser window.
 
 		div
 			div.pull-left

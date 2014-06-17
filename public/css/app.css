@@ -174,7 +174,6 @@ p#continue-scrobbling-note {
 	font-size: small;
 	font-weight: bold;
 	font-style: italic;
-	display: none;
 }
 
 .station-tile.ng-enter,
