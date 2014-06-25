@@ -106,6 +106,7 @@ mongodb.connect(MONGO_URI, function (err, dbClient) {
 
 	app.post('/api/stop-scrobbling', api.stopScrobbling);
 	app.post('/api/scrobble-along', api.scrobbleAlong);
+	app.post('/api/scrobble-timeout-enable', api.scrobbleTimeoutEnable);
 
 	app.get('/api/admin/users', api.allUsers);
 	app.get('/api/admin/stations', api.allStations);
@@ -123,6 +124,12 @@ mongodb.connect(MONGO_URI, function (err, dbClient) {
 
 /*
 todo
+
+- check on scrobble incrementing (esp. XFM)
+- implement the change timeout button
+- implement stopping of scrobble after timeout
+- lotsa testing
+- change track details timout back
 
 contact soma about the block, transfer ownership?
 option to time out scrobbling automatically after a while

@@ -6,7 +6,11 @@ angular.module('scrobbleAlong.controllers', []).
 
 	controller('LoginCtrl', ['$scope', '$cookies', '$window', 'userManagement', function($scope, $cookies, $window, userManagement) {
 		$scope.loggedIn = $cookies.lastfmSession ? true : false;
-		$scope.userDetails = { isScrobbling: false };
+		$scope.userDetails = {
+			isScrobbling: false,
+			scrobbleTimeoutTime: new Date().getTime() + (4*60*60*1000),
+			scrobbleTimeoutEnabled: false
+		};
 		$scope.loaded = true;
 
 		userManagement.getLoginUrl(function(url) {
@@ -29,8 +33,8 @@ angular.module('scrobbleAlong.controllers', []).
 		};
 	}]).
 
-	controller('IndexCtrl', ['$scope', '$timeout', '$window', 'userManagement', 'userDetails', 'stationDetails',
-		function ($scope, $timeout, $window, userManagement, userDetailsSvc, stationDetailsSvc) {
+	controller('IndexCtrl', ['$scope', '$timeout', '$interval', '$window', 'userManagement', 'userDetails', 'stationDetails',
+		function ($scope, $timeout, $interval, $window, userManagement, userDetailsSvc, stationDetailsSvc) {
 
 		$scope.stations = [];
 
@@ -41,7 +45,7 @@ angular.module('scrobbleAlong.controllers', []).
 			});
 
 			stationDetailsSvc.getStationsRecentTracks(stationNames, $scope.stations, function() {
-				$timeout(function() { updateStationsRecentTracks(); }, 20 * 1000);
+				$timeout(function() { updateStationsRecentTracks(); }, 300* 20 * 1000);//temp
 			});
 		};
 
@@ -51,6 +55,7 @@ angular.module('scrobbleAlong.controllers', []).
 				return;
 			}
 
+			setUserDetails(userDetails);
 			$scope.userDetails.lastfmUsername = userDetails.lastfmUsername;
 			var userListeningTo = userDetails.listeningTo;
 			var userScrobbles = userDetails.userScrobbles || {};
@@ -106,8 +111,9 @@ angular.module('scrobbleAlong.controllers', []).
 		$scope.sortStationsBy = $scope.loggedIn ? 'scrobbles' : 'lastfmUsername';
 		$scope.sortStations = function(station) {
 			if ($scope.sortStationsBy == 'scrobbles') {
-				// Secondary sort by name
-				return station.userScrobbles ? station.userScrobbles * -1 : station.lastfmUsername;
+				// Secondary sort by compatibility (will always be sorted by username if not logged in)
+				// Divide tasteometer by 100 since it is a percentage and should always be less than the min number of scrobbles
+				return station.userScrobbles ? station.userScrobbles * -1 : (station.tasteometer * -1) / 100;
 			}
 			else if ($scope.sortStationsBy == 'compatibility') {
 				return station.tasteometer * -1;
@@ -117,10 +123,32 @@ angular.module('scrobbleAlong.controllers', []).
 			}
 		};
 
-		var setCurrentlyScrobbling = function(scrobblingStation) {
+		$scope.scrobbleTimeoutCheckboxChanged = function() {
+			userManagement.setScrobbleTimeoutEnabled($scope.userDetails.scrobbleTimeoutEnabled, function(err, userDetails) {
+				if (err) {
+					$scope.alertMessage = "Error enabling or disabling scrobble timeout, please wait a few moments and try again.";
+				}
+				else {
+					setUserDetails(userDetails);
+				}
+			});
+		};
+
+		$interval(function() {
+			userDetailsSvc.getUserDbInfo(function(userDetails) {
+				if ($scope.loggedIn && (!userDetails || !userDetails.lastfmUsername)) {
+					$window.location.href = '/logout';
+					return;
+				}
+
+				setUserDetails(userDetails);
+			});
+		}, 30 * 1000);
+
+		var setCurrentlyScrobbling = function(scrobblingStationName) {
 			$scope.userDetails.isScrobbling = false;
 			angular.forEach($scope.stations, function(curStation) {
-				if (curStation == scrobblingStation) {
+				if (curStation.lastfmUsername == scrobblingStationName) {
 					$scope.userDetails.isScrobbling = true;
 					curStation.currentlyScrobbling = true;
 				}
@@ -128,14 +156,20 @@ angular.module('scrobbleAlong.controllers', []).
 					curStation.currentlyScrobbling = false
 				}
 			});
-		}
+		};
+			
+		// Set user details that can change
+		var setUserDetails = function(userDetails) {
+			$scope.userDetails.scrobbleTimeoutTime = userDetails.scrobbleTimeoutTime;
+			$scope.userDetails.scrobbleTimeoutEnabled = userDetails.scrobbleTimeoutEnabled;
+			setCurrentlyScrobbling(userDetails.listeningTo);
+		};
 
 		$scope.stopScrobbling = function(station) {
 			if (station && station.lastfmUsername) {
-				userManagement.stopScrobbling(station.lastfmUsername, function(err, status) {
-					if (status) {
-						setCurrentlyScrobbling(null);
-						$scope.alertMessage = null;
+				userManagement.stopScrobbling(station.lastfmUsername, function(err, userDetails) {
+					if (userDetails) {
+						setUserDetails(userDetails);
 					}
 					else {
 						$scope.alertMessage = "Error stopping scrobble, please wait a few moments and try again.";
@@ -145,10 +179,9 @@ angular.module('scrobbleAlong.controllers', []).
 		};
 		$scope.scrobbleAlong = function(station) {
 			if (station && station.lastfmUsername) {
-				userManagement.scrobbleAlong(station.lastfmUsername, function(err, status) {
-					if (status) {
-						setCurrentlyScrobbling(station);
-						$scope.alertMessage = null;
+				userManagement.scrobbleAlong(station.lastfmUsername, function(err, userDetails) {
+					if (userDetails) {
+						setUserDetails(userDetails);
 					}
 					else {
 				        $scope.alertMessage = "Error scrobbling along, please wait a few moments and try again.";

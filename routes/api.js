@@ -43,7 +43,9 @@ exports.userDetails = function (req, res) {
 			res.json({
 				username: null,
 				listening: null,
-				scrobbles: null
+				scrobbles: null,
+				scrobbleTimeoutTime: null,
+				scrobbleTimeoutEnabled: false
 			});
 		}
 		else if (!record['_id']) {
@@ -54,7 +56,9 @@ exports.userDetails = function (req, res) {
 			res.json({
 				username: record['_id'],
 				listening: record['listening'],
-				scrobbles: record['scrobbles']
+				scrobbles: record['scrobbles'],
+				scrobbleTimeoutTime: record['scrobbleTimeoutTime'],
+				scrobbleTimeoutEnabled: record['scrobbleTimeoutEnabled'],
 			});
 		}
 	});
@@ -258,13 +262,19 @@ var updateScrobbling = function(req, res, stationName) {
 			return;
 		}
 		var username = record['_id'];
-		mongoDao.setUserScrobbling(username, stationName, function(err, status) {
+		mongoDao.setUserScrobbling(username, stationName, function(err, userDetails) {
 			if (err) {
 				winston.error("Error setting user as not scrobbling:", err);
 				res.status(500).send('Error stopping scrobble');
 			}
 			else {
-				res.send("ok");
+				res.json({
+					username: userDetails['_id'],
+					listening: userDetails['listening'],
+					scrobbles: userDetails['scrobbles'],
+					scrobbleTimeoutTime: userDetails['scrobbleTimeoutTime'],
+					scrobbleTimeoutEnabled: userDetails['scrobbleTimeoutEnabled'],
+				});
 			}
 		});
 	});
@@ -281,6 +291,45 @@ exports.scrobbleAlong = function(req, res) {
 		return;
 	}
 	updateScrobbling(req, res, req.body.username);
+};
+
+exports.scrobbleTimeoutEnable = function(req, res) {
+	if (!req.body || !('enabled' in req.body)) {
+		winston.error("Scrobble timeout enable had invalid body");
+		res.status(500).send('Invalid request body');
+		return;
+	}
+
+	var session = req.cookies['lastfmSession'];
+	if (!session) {
+		winston.error("Session cookie not provided when enabling/disabling scrobble timeout");
+		res.status(500).send("Session cookie is required to enable/disable scrobble timeout");
+		return;
+	}
+
+	mongoDao.getUserData(session, function (err, record) {
+		if (err || !record || !record['_id']) {
+			winston.error("Error loading user while enabling/disabling scrobble timeout:", err);
+			res.status(500).send('Error enabling/disabling scrobble timeout');
+			return;
+		}
+		var username = record['_id'];
+		mongoDao.setScrobbleTimeoutEnabled(username, req.body.enabled, function(err, userDetails) {
+			if (err) {
+				winston.error("Error enabling/disabling scrobble timeout:", err);
+				res.status(500).send('Error enabling/disabling scrobble timeout');
+			}
+			else {
+				res.json({
+					username: userDetails['_id'],
+					listening: userDetails['listening'],
+					scrobbles: userDetails['scrobbles'],
+					scrobbleTimeoutTime: userDetails['scrobbleTimeoutTime'],
+					scrobbleTimeoutEnabled: userDetails['scrobbleTimeoutEnabled'],
+				});
+			}
+		});
+	});
 };
 
 

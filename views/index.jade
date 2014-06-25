@@ -3,7 +3,9 @@ extends layout
 block body
 	div.ng-hide(data-ng-controller='IndexCtrl', data-ng-show="loaded")
 
-		div.alert.alert-danger(data-ng-if='alertMessage') {{ alertMessage }}
+		div.alert.alert-danger(data-ng-if='alertMessage')
+			a.close(data-dismiss='alert') ×
+			| {{ alertMessage }}
 
 		div.jumbotron(data-ng-if='loaded && !loggedIn')
 			h2.text-center Scrobble Along
@@ -19,6 +21,14 @@ block body
 			div#user-info
 				div.user-tile(user-tile)
 				div.station-tile(data-ng-repeat='station in stations | filter:{currentlyScrobbling:true}', station-tile)
+				form.form-inline(data-ng-if='userDetails.isScrobbling && userDetails.scrobbleTimeoutTime', role='form')
+					div.checkbox(data-ng-class='{ disabled: !userDetails.scrobbleTimeoutEnabled }')
+						label
+							input.scrobble-timeout-checkbox(type='checkbox', data-ng-model='userDetails.scrobbleTimeoutEnabled', data-ng-change='scrobbleTimeoutCheckboxChanged()')
+							| Automatically stop scrobbling 
+							span(data-ng-if='userDetails.scrobbleTimeoutEnabled', am-time-ago='userDetails.scrobbleTimeoutTime')
+							span(data-ng-if='!userDetails.scrobbleTimeoutEnabled') in 4 hours
+							button.btn.btn-default.btn-xs.change-timeout-button(type='button', data-ng-disabled='!userDetails.scrobbleTimeoutEnabled') Change
 				p#continue-scrobbling-note(data-ng-if='userDetails.isScrobbling') Note: ScrobbleAlong will continue scrobbling even if you close your browser window.
 
 		div

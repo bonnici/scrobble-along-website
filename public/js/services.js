@@ -48,14 +48,18 @@ angular.module('scrobbleAlong.services', []).
 						callback({
 							lastfmUsername: data.username,
 							listeningTo: data.listening,
-							userScrobbles: data.scrobbles
+							userScrobbles: data.scrobbles,
+							scrobbleTimeoutTime: data.scrobbleTimeoutTime,
+							scrobbleTimeoutEnabled: data.scrobbleTimeoutEnabled
 						});
 					}
 					else {
 						callback({
 							lastfmUsername: null,
 							listeningTo: null,
-							userScrobbles: {}
+							userScrobbles: {},
+							scrobbleTimeoutTime: null,
+							scrobbleTimeoutEnabled: false
 						});
 					}
 				});
@@ -81,7 +85,7 @@ angular.module('scrobbleAlong.services', []).
 		// Updates the stations details in batches, callback is called when everything is done
 		var getApiBatch = function(batchSize, url, stationNames, username, stations, callback) {
 			if (stationNames.length == 0) {
-				callback();
+				if (callback) callback();
 				return;
 			}
 
@@ -109,7 +113,7 @@ angular.module('scrobbleAlong.services', []).
 			// Returns an array of station details in the callback
 			getAllStationsDbInfo: function(callback) {
 				baseApi.getApiUrl('stations', null, function(data) {
-					callback(data || []);
+					if (callback) callback(data || []);
 				});
 			},
 
@@ -161,11 +165,48 @@ angular.module('scrobbleAlong.services', []).
 			},
 
 			stopScrobbling: function(stationUsername, callback) {
-				baseApi.postApiUrl('stop-scrobbling', {}, callback);
+				baseApi.postApiUrl('stop-scrobbling', {}, function(error, userDetails) {
+					if (error) {
+						callback(error, null);
+					}
+					else {
+						callback(null, {
+							listeningTo: userDetails.listening,
+							scrobbleTimeoutTime: userDetails.scrobbleTimeoutTime,
+							scrobbleTimeoutEnabled: userDetails.scrobbleTimeoutEnabled
+						});
+					}
+				});
 			},
 
 			scrobbleAlong: function(stationUsername, callback) {
-				baseApi.postApiUrl('scrobble-along', { username: stationUsername }, callback);
+				baseApi.postApiUrl('scrobble-along', { username: stationUsername }, function(error, userDetails) {
+					if (error) {
+						callback(error, null);
+					}
+					else {
+						callback(null, {
+							listeningTo: userDetails.listening,
+							scrobbleTimeoutTime: userDetails.scrobbleTimeoutTime,
+							scrobbleTimeoutEnabled: userDetails.scrobbleTimeoutEnabled
+						});
+					}
+				});
+			},
+
+			setScrobbleTimeoutEnabled: function(enabled, callback) {
+				baseApi.postApiUrl('scrobble-timeout-enable', { enabled: enabled }, function(error, userDetails) {
+					if (error) {
+						callback(error, null);
+					}
+					else {
+						callback(null, {
+							listeningTo: userDetails.listening,
+							scrobbleTimeoutTime: userDetails.scrobbleTimeoutTime,
+							scrobbleTimeoutEnabled: userDetails.scrobbleTimeoutEnabled
+						});
+					}
+				});
 			}
 		};
 

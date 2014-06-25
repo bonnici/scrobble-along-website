@@ -2,11 +2,10 @@
 
 /* Filters */
 
-/*
 angular.module('scrobbleAlong.filters', []).
-	filter('interpolate', function (version) {
-		return function (text) {
-			return String(text).replace(/\%VERSION\%/mg, version);
+	filter('timeoutTime', function () {
+		return function (timestamp) {
+			var date = new Date(timestamp * 1000);
+			return date.toISOString();
 		};
 	});
-*/

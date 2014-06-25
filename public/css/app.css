@@ -176,6 +176,19 @@ p#continue-scrobbling-note {
 	font-style: italic;
 }
 
+input.scrobble-timeout-checkbox {
+	float:left!important; /* fixes alignment issue for some reason */
+	margin-right: 5px;
+}
+
+form div.disabled label {
+	color: gray;
+}
+
+.change-timeout-button {
+	margin-left: 5px;
+}
+
 .station-tile.ng-enter,
 .station-tile.ng-leave {
 	-webkit-transition: 0.15s linear all;

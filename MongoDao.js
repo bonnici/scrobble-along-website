@@ -1,6 +1,8 @@
 var _ = require("underscore");
 var winston = require("winston");
 
+var DEFAULT_TIMEOUT_TIME = 4*60*60*1000; // 4 hours
+
 var MongoDao = (function () {
 	function MongoDao(userCrypter, stationCrypter, dbClient) {
 		this.userCrypter = userCrypter;
@@ -57,7 +59,8 @@ var MongoDao = (function () {
 	MongoDao.prototype.setUserScrobbling = function (username, stationName, callback) {
 		var updates = {};
 		if (stationName) {
-			updates = { $set: { listening: stationName } };
+			var now = new Date();
+			updates = { $set: { listening: stationName, scrobbleTimeoutTime: now.getTime() + DEFAULT_TIMEOUT_TIME } };
 			winston.info("Setting user " + username + " as scrobbling " + stationName);
 		}
 		else {
@@ -75,7 +78,7 @@ var MongoDao = (function () {
 				{ _id: username },
 				[['_id', 'asc']],
 				updates,
-				{ upsert: false },
+				{ upsert: false, new: true },
 				function (error, record) {
 					if (error) {
 						var message = "Could not update listening of user " + username + ": " + error.message;
@@ -83,7 +86,33 @@ var MongoDao = (function () {
 						callback(error, null);
 					}
 					else {
-						callback(null, "ok");
+						callback(null, record);
+					}
+				});
+		});
+	};
+
+	MongoDao.prototype.setScrobbleTimeoutEnabled = function (username, enabled, callback) {
+		this.dbClient.collection('user', function (error, collection) {
+			if (error) {
+				callback(error, null);
+				return;
+			}
+
+			var now = new Date();
+			collection.findAndModify(
+				{ _id: username },
+				[['_id', 'asc']],
+				{ $set: { scrobbleTimeoutEnabled: enabled, scrobbleTimeoutTime: now.getTime() + DEFAULT_TIMEOUT_TIME } },
+				{ upsert: false, new: true },
+				function (error, record) {
+					if (error) {
+						var message = "Could not update scrobble timeout enabled of user " + username + ": " + error.message;
+						winston.error(message);
+						callback(error, null);
+					}
+					else {
+						callback(null, record);
 					}
 				});
 		});
