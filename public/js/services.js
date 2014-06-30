@@ -207,6 +207,21 @@ angular.module('scrobbleAlong.services', []).
 						});
 					}
 				});
+			},
+
+			changeScrobbleTimeout: function(numMinutes, callback) {
+				baseApi.postApiUrl('scrobble-timeout-change', { minutes: numMinutes }, function(error, userDetails) {
+					if (error) {
+						callback(error, null);
+					}
+					else {
+						callback(null, {
+							listeningTo: userDetails.listening,
+							scrobbleTimeoutTime: userDetails.scrobbleTimeoutTime,
+							scrobbleTimeoutEnabled: userDetails.scrobbleTimeoutEnabled
+						});
+					}
+				});
 			}
 		};
 

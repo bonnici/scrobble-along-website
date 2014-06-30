@@ -273,7 +273,7 @@ var updateScrobbling = function(req, res, stationName) {
 					listening: userDetails['listening'],
 					scrobbles: userDetails['scrobbles'],
 					scrobbleTimeoutTime: userDetails['scrobbleTimeoutTime'],
-					scrobbleTimeoutEnabled: userDetails['scrobbleTimeoutEnabled'],
+					scrobbleTimeoutEnabled: userDetails['scrobbleTimeoutEnabled']
 				});
 			}
 		});
@@ -318,6 +318,46 @@ exports.scrobbleTimeoutEnable = function(req, res) {
 			if (err) {
 				winston.error("Error enabling/disabling scrobble timeout:", err);
 				res.status(500).send('Error enabling/disabling scrobble timeout');
+			}
+			else {
+				res.json({
+					username: userDetails['_id'],
+					listening: userDetails['listening'],
+					scrobbles: userDetails['scrobbles'],
+					scrobbleTimeoutTime: userDetails['scrobbleTimeoutTime'],
+					scrobbleTimeoutEnabled: userDetails['scrobbleTimeoutEnabled']
+				});
+			}
+		});
+	});
+};
+
+exports.scrobbleTimeoutChange = function(req, res) {
+	if (!req.body || !('minutes' in req.body)) {
+		winston.error("Scrobble timeout change had invalid body");
+		res.status(500).send('Invalid request body');
+		return;
+	}
+
+	var session = req.cookies['lastfmSession'];
+	if (!session) {
+		winston.error("Session cookie not provided when changing scrobble timeout");
+		res.status(500).send("Session cookie is required to changing scrobble timeout");
+		return;
+	}
+
+	mongoDao.getUserData(session, function (err, record) {
+		if (err || !record || !record['_id']) {
+			winston.error("Error loading user while changing scrobble timeout:", err);
+			res.status(500).send('Error changing scrobble timeout');
+			return;
+		}
+		var username = record['_id'];
+		var newTime = (new Date().getTime()) + (req.body.minutes * 60 * 1000);
+		mongoDao.changeScrobbleTimeout(username, newTime, function(err, userDetails) {
+			if (err) {
+				winston.error("Error changing scrobble timeout:", err);
+				res.status(500).send('Error changing scrobble timeout');
 			}
 			else {
 				res.json({

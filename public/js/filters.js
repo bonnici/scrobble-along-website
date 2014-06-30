@@ -3,9 +3,17 @@
 /* Filters */
 
 angular.module('scrobbleAlong.filters', []).
-	filter('timeoutTime', function () {
+	filter('formatScrobbleTimeoutTime', function () {
 		return function (timestamp) {
-			var date = new Date(timestamp * 1000);
-			return date.toISOString();
+			var difference = timestamp - new Date().getTime();
+			
+			if (difference < (60 * 1000)) {
+				return "soon";
+			}
+			else {
+				var hours = parseInt(difference / (60 * 60 * 1000));
+				var minutes = Math.round((difference - (hours * 60 * 60 * 1000)) / (60 * 1000));
+				return "in " + hours + " hrs and " + minutes + " mins";
+			}
 		};
 	});

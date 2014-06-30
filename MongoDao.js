@@ -118,6 +118,31 @@ var MongoDao = (function () {
 		});
 	};
 
+	MongoDao.prototype.changeScrobbleTimeout = function (username, newTime, callback) {
+		this.dbClient.collection('user', function (error, collection) {
+			if (error) {
+				callback(error, null);
+				return;
+			}
+
+			collection.findAndModify(
+				{ _id: username },
+				[['_id', 'asc']],
+				{ $set: { scrobbleTimeoutTime: newTime } },
+				{ upsert: false, new: true },
+				function (error, record) {
+					if (error) {
+						var message = "Could not change scrobble timeout time of user " + username + ": " + error.message;
+						winston.error(message);
+						callback(error, null);
+					}
+					else {
+						callback(null, record);
+					}
+				});
+		});
+	};
+
 	MongoDao.prototype.getAllUserData = function(callback) {
 		var crypter = this.userCrypter;
 		this.dbClient.collection('user', function (error, collection) {

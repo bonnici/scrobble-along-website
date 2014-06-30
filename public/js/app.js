@@ -8,8 +8,7 @@ angular.module('scrobbleAlong', [
 	'scrobbleAlong.services',
 	'scrobbleAlong.directives',
 	'ngCookies',
-	'ngAnimate',
-	'angularMoment'
+	'ngAnimate'
 ]).
 config(function ($locationProvider) {
 	$locationProvider.html5Mode(true);

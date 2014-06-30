@@ -37,6 +37,7 @@ angular.module('scrobbleAlong.controllers', []).
 		function ($scope, $timeout, $interval, $window, userManagement, userDetailsSvc, stationDetailsSvc) {
 
 		$scope.stations = [];
+		$scope.newScrobbleTimeout = { hours: 4, minutes: 0, inputError: false }; // Model for "change timeout time" modal
 
 		var updateStationsRecentTracks = function() {
 			var stationNames = [];
@@ -188,6 +189,30 @@ angular.module('scrobbleAlong.controllers', []).
 					}
 				});
 			}
+		};
+			
+		var newScrobbleTimeoutIsValid = function() {
+			return angular.isNumber($scope.newScrobbleTimeout.hours) && angular.isNumber($scope.newScrobbleTimeout.minutes);
+		};
+		$scope.changeScrobbleTimeoutInputChanged = function() {
+			$scope.newScrobbleTimeout.inputError = !newScrobbleTimeoutIsValid();
+		};			
+		$scope.changeScrobbleTimeout = function() {
+			if (!newScrobbleTimeoutIsValid()) {
+				return;
+			}
+			
+			var minutes = ($scope.newScrobbleTimeout.hours * 60) + $scope.newScrobbleTimeout.minutes; 
+			userManagement.changeScrobbleTimeout(minutes, function(err, userDetails) {
+				if (userDetails) {
+					setUserDetails(userDetails);
+				}
+				else {
+					$scope.alertMessage = "Error changing the scrobble timeout time, please wait a few moments and try again.";
+				}
+				$('#change-timeout-modal').modal('hide');
+				$scope.newScrobbleTimeout = { hours: 4, minutes: 0, inputError: false };
+			});
 		};
 	}]).
 

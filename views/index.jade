@@ -26,9 +26,9 @@ block body
 						label
 							input.scrobble-timeout-checkbox(type='checkbox', data-ng-model='userDetails.scrobbleTimeoutEnabled', data-ng-change='scrobbleTimeoutCheckboxChanged()')
 							| Automatically stop scrobbling 
-							span(data-ng-if='userDetails.scrobbleTimeoutEnabled', am-time-ago='userDetails.scrobbleTimeoutTime')
+							span(data-ng-if='userDetails.scrobbleTimeoutEnabled') {{ userDetails.scrobbleTimeoutTime | formatScrobbleTimeoutTime }}
 							span(data-ng-if='!userDetails.scrobbleTimeoutEnabled') in 4 hours
-							button.btn.btn-default.btn-xs.change-timeout-button(type='button', data-ng-disabled='!userDetails.scrobbleTimeoutEnabled') Change
+							button.btn.btn-default.btn-xs.change-timeout-button(type='button', data-ng-disabled='!userDetails.scrobbleTimeoutEnabled', data-toggle='modal', data-target='#change-timeout-modal') Change
 				p#continue-scrobbling-note(data-ng-if='userDetails.isScrobbling') Note: ScrobbleAlong will continue scrobbling even if you close your browser window.
 
 		div
@@ -45,3 +45,21 @@ block body
 		div.well.stations
 			div.station-tile(data-ng-repeat='station in stations | filter:{currentlyScrobbling:false} | orderBy:sortStations', station-tile)
 			div.clearfix
+
+		div.modal.fade#change-timeout-modal(role='modal', aria-labelledby='change-timeout-modal-title')
+			div.modal-dialog
+				div.modal-content
+					div.modal-header
+						button.close(type='button', data-dismiss='modal', aria-hidden='true') &times;
+						h4.modal-title#change-timeout-modal-title Change Scrobble Timeout
+					div.modal-body
+						form.form-inline(mode='form')
+							div.form-group(data-ng-class="{'has-error': newScrobbleTimeout.inputError}")
+								label Stop scrobbling in:
+								input.form-control#timeout-hours-input(type='number', min='0', max='48', data-ng-model='newScrobbleTimeout.hours', data-ng-change='changeScrobbleTimeoutInputChanged()')
+								label(for='timeout-hours-input') hours and
+								input.form-control#timeout-minutes-input(type='number', min='0', max='59', data-ng-model='newScrobbleTimeout.minutes', data-ng-change='changeScrobbleTimeoutInputChanged()')
+								label(for='timeout-minutes-input') minutes
+					div.modal-footer
+						button.btn.btn-default(data-dismiss='modal') Cancel
+						a.btn.btn-primary(role='button', data-ng-click='changeScrobbleTimeout()') Save
