@@ -126,11 +126,6 @@ mongodb.connect(MONGO_URI, function (err, dbClient) {
 /*
 todo
 
-- check on scrobble incrementing (esp. XFM)
-- implement stopping of scrobble after timeout
-- lotsa testing
-- change track details timeout time back/other todos
-
 contact soma about the block, transfer ownership?
 option to time out scrobbling automatically after a while
 store recent tracks in mongo (?)
