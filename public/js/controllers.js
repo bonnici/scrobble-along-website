@@ -33,9 +33,11 @@ angular.module('scrobbleAlong.controllers', []).
 		};
 	}]).
 
-	controller('IndexCtrl', ['$scope', '$timeout', '$interval', '$window', 'userManagement', 'userDetails', 'stationDetails',
-		function ($scope, $timeout, $interval, $window, userManagement, userDetailsSvc, stationDetailsSvc) {
+	controller('IndexCtrl', ['$scope', '$timeout', '$interval', '$window', '$location', 'userManagement', 'userDetails', 'stationDetails',
+		function ($scope, $timeout, $interval, $window, $location, userManagement, userDetailsSvc, stationDetailsSvc) {
 
+		var nocache = 'nocache' in $location.search();
+			
 		$scope.stations = [];
 		$scope.newScrobbleTimeout = { hours: 4, minutes: 0, inputError: false }; // Model for "change timeout time" modal
 
@@ -45,7 +47,7 @@ angular.module('scrobbleAlong.controllers', []).
 				stationNames.push(station.lastfmUsername);
 			});
 
-			stationDetailsSvc.getStationsRecentTracks(stationNames, $scope.stations, function() {
+			stationDetailsSvc.getStationsRecentTracks(stationNames, $scope.stations, nocache, function() {
 				$timeout(function() { updateStationsRecentTracks(); }, 30 * 20 * 1000);
 			});
 		};
@@ -62,14 +64,14 @@ angular.module('scrobbleAlong.controllers', []).
 			var userScrobbles = userDetails.userScrobbles || {};
 
 			if ($scope.userDetails.lastfmUsername) {
-				userDetailsSvc.getUserLfmInfo($scope.userDetails.lastfmUsername, function(userInfo) {
+				userDetailsSvc.getUserLfmInfo($scope.userDetails.lastfmUsername, nocache, function(userInfo) {
 					if (userInfo && userInfo.lastfmProfileImage) {
 						$scope.userDetails.lastfmProfileImage = userInfo.lastfmProfileImage;
 					}
 				});
 			}
 
-			stationDetailsSvc.getAllStationsDbInfo(function(stationDbInfo) {
+			stationDetailsSvc.getAllStationsDbInfo(nocache, function(stationDbInfo) {
 				$scope.stations = stationDbInfo;
 
 				var stationNames = [];
@@ -86,8 +88,8 @@ angular.module('scrobbleAlong.controllers', []).
 					}
 				});
 
-				stationDetailsSvc.getStationsLfmInfo(stationNames, $scope.stations);
-				stationDetailsSvc.getStationsTasteometer(stationNames, $scope.userDetails.lastfmUsername, $scope.stations);
+				stationDetailsSvc.getStationsLfmInfo(stationNames, $scope.stations, nocache);
+				stationDetailsSvc.getStationsTasteometer(stationNames, $scope.userDetails.lastfmUsername, $scope.stations, nocache);
 				updateStationsRecentTracks(); // Fires a timeout to re-update later
 			});
 		});

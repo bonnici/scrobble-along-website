@@ -125,9 +125,6 @@ mongodb.connect(MONGO_URI, function (err, dbClient) {
 
 /*
 todo
-
-contact soma about the block, transfer ownership?
-option to time out scrobbling automatically after a while
 store recent tracks in mongo (?)
 better UI
 */

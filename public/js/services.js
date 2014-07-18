@@ -65,8 +65,12 @@ angular.module('scrobbleAlong.services', []).
 				});
 			},
 
-			getUserLfmInfo: function(username, callback) {
-				baseApi.getApiUrl('user-lastfm-info', { user: username }, function(data) {
+			getUserLfmInfo: function(username, nocache, callback) {
+				var params = { user: username };
+				if (nocache) {
+					params['nocache'] = true;
+				}
+				baseApi.getApiUrl('user-lastfm-info', params, function(data) {
 					if (data) {
 						callback(data);
 					}
@@ -83,7 +87,7 @@ angular.module('scrobbleAlong.services', []).
 	factory('stationDetails', ['baseApi', function(baseApi) {
 
 		// Updates the stations details in batches, callback is called when everything is done
-		var getApiBatch = function(batchSize, url, stationNames, username, stations, callback) {
+		var getApiBatch = function(batchSize, url, stationNames, username, stations, nocache, callback) {
 			if (stationNames.length == 0) {
 				if (callback) callback();
 				return;
@@ -96,6 +100,9 @@ angular.module('scrobbleAlong.services', []).
 			if (username) {
 				params['user'] = username;
 			}
+			if (nocache) {
+				params['nocache'] = true;
+			}
 
 			baseApi.getApiUrl(url, params, function(data) {
 				angular.forEach(stations, function(station) {
@@ -104,46 +111,50 @@ angular.module('scrobbleAlong.services', []).
 					}
 				});
 
-				getApiBatch(batchSize, url, stationNames, username, stations, callback);
+				getApiBatch(batchSize, url, stationNames, username, stations, nocache, callback);
 			});
 		};
 
 		var apiServiceInstance = {
 
 			// Returns an array of station details in the callback
-			getAllStationsDbInfo: function(callback) {
-				baseApi.getApiUrl('stations', null, function(data) {
+			getAllStationsDbInfo: function(nocache, callback) {
+				var params = { };
+				if (nocache) {
+					params['nocache'] = true;
+				}
+				baseApi.getApiUrl('stations', params, function(data) {
 					if (callback) callback(data || []);
 				});
 			},
 
 			// Returns a map of station name to last.fm details (profile pic) in the callback
-			getStationsLfmInfo: function(stationNames, results, callback) {
+			getStationsLfmInfo: function(stationNames, results, nocache, callback) {
 				if (!stationNames || stationNames.length == 0) {
 					if (callback) callback();
 					return;
 				}
 
-				getApiBatch(10, 'station-lastfm-info', stationNames, null, results, callback);
+				getApiBatch(10, 'station-lastfm-info', stationNames, null, results, nocache, callback);
 			},
 
 			// Returns a map of station name to tasteometer scores in the callback
-			getStationsTasteometer: function(stationNames, username, results, callback) {
+			getStationsTasteometer: function(stationNames, username, results, nocache, callback) {
 				if (!stationNames || stationNames.length == 0 || !username) {
 					if (callback) callback();
 					return;
 				}
 
-				getApiBatch(10, 'station-lastfm-tasteometer', stationNames, username, results, callback);
+				getApiBatch(10, 'station-lastfm-tasteometer', stationNames, username, results, nocache, callback);
 			},
 
-			getStationsRecentTracks: function(stationNames, results, callback) {
+			getStationsRecentTracks: function(stationNames, results, nocache, callback) {
 				if (!stationNames || stationNames.length == 0) {
 					if (callback) callback();
 					return;
 				}
 
-				getApiBatch(5, 'station-lastfm-recenttracks', stationNames, null, results, callback);
+				getApiBatch(5, 'station-lastfm-recenttracks', stationNames, null, results, nocache, callback);
 			}
 		};
 

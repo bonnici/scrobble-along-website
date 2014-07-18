@@ -65,7 +65,13 @@ exports.userDetails = function (req, res) {
 
 };
 
-var cacheRespond = function(key, expires, res, callback) {
+var cacheRespond = function(key, expires, nocache, res, callback) {
+	if (nocache) {
+		winston.info("Skipping cache", key);
+		callback(function() { });
+		return;
+	}
+	
 	cacheClient.get(key, function(err, value) {
 		if (value) {
 			winston.info("Returning from cache", { key:key, value:value.toString() });
@@ -82,7 +88,7 @@ var cacheRespond = function(key, expires, res, callback) {
 };
 
 exports.stations = function (req, res) {
-	cacheRespond("all-stations", 12*60*60, res, function(updateCallback) {
+	cacheRespond("all-stations", 12*60*60, 'nocache' in req.query, res, function(updateCallback) {
 		mongoDao.getStations(function (err, stationArray) {
 			if (err) {
 				winston.error("Error loading stations:", err);
@@ -117,7 +123,7 @@ exports.userLastfmInfo = function(req, res) {
 		return;
 	}
 
-	cacheRespond("user-lastfm-" + req.query.user, 12*60*60, res, function(updateCallback) {
+	cacheRespond("user-lastfm-" + req.query.user, 12*60*60, 'nocache' in req.query, res, function(updateCallback) {
 		lastfmDao.getUserInfo(req.query.user, function(err, details) {
 			if (err || !details.lastfmProfileImage) {
 				winston.error("Error getting user info for user:", err);
@@ -144,7 +150,7 @@ exports.stationLastfmInfo = function(req, res) {
 		return;
 	}
 
-	cacheRespond("station-lastfm-info-v2-" + req.query.stations, 12*60*60, res, function(updateCallback) {
+	cacheRespond("station-lastfm-info-v2-" + req.query.stations, 12*60*60, 'nocache' in req.query, res, function(updateCallback) {
 		var stationDetails = {};
 		async.map(stations, lastfmDao.getUserInfo, function(err, results) {
 			if (err) {
@@ -179,7 +185,7 @@ exports.stationLastfmTasteometer = function(req, res) {
 		return;
 	}
 
-	cacheRespond("station-lastfm-tasteometer-v2-" + req.query.user + "-" + req.query.stations, 12*60*60, res, function(updateCallback) {
+	cacheRespond("station-lastfm-tasteometer-v2-" + req.query.user + "-" + req.query.stations, 12*60*60, 'nocache' in req.query, res, function(updateCallback) {
 		var tasteometerData = [];
 		_.each(stations, function(station) {
 			tasteometerData.push({ user1: req.query.user, user2: station });
@@ -215,7 +221,7 @@ exports.stationLastfmRecentTracks = function(req, res) {
 		return;
 	}
 
-	cacheRespond("station-lastfm-recenttracks-v2-" + req.query.stations, 20, res, function(updateCallback) {
+	cacheRespond("station-lastfm-recenttracks-v2-" + req.query.stations, 20, 'nocache' in req.query, res, function(updateCallback) {
 		var recentTrackResults = {};
 		async.map(stations, lastfmDao.getRecentTracks, function(err, results) {
 			if (err && (!results || results.length == 0)) {
