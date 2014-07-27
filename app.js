@@ -80,7 +80,7 @@ if (app.get('env') === 'production') {
 	setInterval(function() {
 		console.info("Forcing reboot");
 		process.exit(0);
-	}, /*24*60**/60*1000);
+	}, 24*60*60*1000);
 }
 
 mongodb.connect(MONGO_URI, function (err, dbClient) {
