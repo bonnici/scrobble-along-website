@@ -48,7 +48,7 @@ angular.module('scrobbleAlong.controllers', []).
 			});
 
 			stationDetailsSvc.getStationsRecentTracks(stationNames, $scope.stations, nocache, function() {
-				$timeout(function() { updateStationsRecentTracks(); }, 30 * 20 * 1000);
+				$timeout(function() { updateStationsRecentTracks(); }, 20 * 1000);
 			});
 		};
 

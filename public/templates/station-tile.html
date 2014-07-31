@@ -30,9 +30,11 @@
 			<img data-ng-if="station.recentTracks === null" src="/img/ajax-loader.gif" class="loading">
 
 			<div data-ng-repeat="track in station.recentTracks | limitTo:3" class="track-row">
+				<!--
 				<div class="track-image">
 					<a href="{{track.url}}" target="_blank"><img data-ng-src="{{track.image || '/img/album-placeholder.png'}}"></a>
 				</div>
+				-->
 				<div class="track-name">
 					<a href="{{track.url}}" target="_blank" title="{{track.artist}} - {{track.name}}">
 						{{track.artist}}
