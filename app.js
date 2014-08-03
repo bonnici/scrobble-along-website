@@ -75,12 +75,12 @@ var lastfmNode = new lastfm.LastFmNode({
 
 var lastfmDao = new lfmDao.LastFmDao(lastfmNode);
 
-// Force restart of app every day, hack until I can work out why last.fm requests start failing consistently after about 2 days
+// Force restart of app every 6 hours, hack until I can work out why last.fm requests start failing consistently after some time
 if (app.get('env') === 'production') {
 	setInterval(function() {
 		console.info("Forcing reboot");
 		process.exit(0);
-	}, 24*60*60*1000);
+	}, 6*60*60*1000);
 }
 
 mongodb.connect(MONGO_URI, function (err, dbClient) {
