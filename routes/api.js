@@ -105,7 +105,8 @@ exports.stations = function (req, res) {
 						stations.push({
 							lastfmUsername: record['_id'],
 							stationUrl: record['stationUrl'],
-							streamUrl: record['streamUrl']
+							streamUrl: record['streamUrl'],
+							lastfmProfileImage: ('profileImageUrl' in record ? record['profileImageUrl'] : null)
 						});
 					}
 				});

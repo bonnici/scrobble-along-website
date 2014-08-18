@@ -88,7 +88,9 @@ angular.module('scrobbleAlong.controllers', []).
 					}
 				});
 
-				stationDetailsSvc.getStationsLfmInfo(stationNames, $scope.stations, nocache);
+				//station profile images now come from mongo 
+				//stationDetailsSvc.getStationsLfmInfo(stationNames, $scope.stations, nocache);
+				
 				stationDetailsSvc.getStationsTasteometer(stationNames, $scope.userDetails.lastfmUsername, $scope.stations, nocache);
 				updateStationsRecentTracks(); // Fires a timeout to re-update later
 			});

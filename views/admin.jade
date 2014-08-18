@@ -9,26 +9,28 @@ block body
 
 		h3 Stations
 
-		div Username / Scraper / Scraper Param / Station URL / Stream URL / Disabled / Session
+		div Username / Scraper / Scraper Param / Station URL / Stream URL / Profile Image URL / Disabled / Session
 
 		div
-			input(type='text', data-ng-model='newStation["_id"]')
-			input(type='text', data-ng-model='newStation.parser')
-			input(type='text', data-ng-model='newStation.scraperParam')
+			input(type='text', size="12", data-ng-model='newStation["_id"]')
+			input(type='text', size="15", data-ng-model='newStation.parser')
+			input(type='text', size="12", data-ng-model='newStation.scraperParam')
 			input(type='text', data-ng-model='newStation.stationUrl')
 			input(type='text', data-ng-model='newStation.streamUrl')
+			input(type='text', data-ng-model='newStation.profileImageUrl')
 			input(type='checkbox', data-ng-model='newStation.disabled')
-			input(type='text', data-ng-model='newStation.session')
+			input(type='text', size="10", data-ng-model='newStation.session')
 			button(data-ng-click='addStation()') Add
 
 		div(data-ng-repeat='station in stationDetails | orderBy:sortStations')
-			input(type='text', data-ng-model='station["_id"]', disabled)
-			input(type='text', data-ng-model='station.parser')
-			input(type='text', data-ng-model='station.scraperParam')
+			input(type='text', size="12", data-ng-model='station["_id"]', disabled)
+			input(type='text', size="15", data-ng-model='station.parser')
+			input(type='text', size="12", data-ng-model='station.scraperParam')
 			input(type='text', data-ng-model='station.stationUrl')
 			input(type='text', data-ng-model='station.streamUrl')
+			input(type='text', data-ng-model='station.profileImageUrl')
 			input(type='checkbox', data-ng-model='station.disabled', data-ng-true-value="true")
-			input(type='text', data-ng-model='station.session')
+			input(type='text', size="10", data-ng-model='station.session')
 			button(data-ng-click='updateStation(station)') Update
 
 		h3 Users

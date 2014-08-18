@@ -206,6 +206,7 @@ var MongoDao = (function () {
 		if (station.stationUrl) { stationFields.stationUrl = station.stationUrl };
 		if (station.streamUrl) { stationFields.streamUrl = station.streamUrl };
 		if (station.session) { stationFields.session = crypter.encrypt(station.session) };
+		if (station.profileImageUrl) { stationFields.profileImageUrl = station.profileImageUrl };
 
 		this.dbClient.collection('station', function (error, collection) {
 			collection.insert(stationFields, callback);
@@ -226,6 +227,7 @@ var MongoDao = (function () {
 		if (station.stationUrl) { stationFields.stationUrl = station.stationUrl }
 		if (station.streamUrl) { stationFields.streamUrl = station.streamUrl }
 		if (station.session) { stationFields.session = crypter.encrypt(station.session) }
+		if (station.profileImageUrl) { stationFields.profileImageUrl = station.profileImageUrl };
 
 		if (station.disabled == 'true') {
 			stationFields.disabled = 'true';
