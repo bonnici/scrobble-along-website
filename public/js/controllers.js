@@ -80,7 +80,7 @@ angular.module('scrobbleAlong.controllers', []).
 					station.userScrobbles = userScrobbles[station.lastfmUsername] || 0;
 					station.tasteometer = null; // Initial setting so sorting works while the page is loading
 					station.currentlyScrobbling = false;
-					station.recentTracks = null;
+					//station.recentTracks = null;
 
 					if (userListeningTo && station.lastfmUsername == userListeningTo) {
 						station.currentlyScrobbling = true;
@@ -92,7 +92,7 @@ angular.module('scrobbleAlong.controllers', []).
 				//stationDetailsSvc.getStationsLfmInfo(stationNames, $scope.stations, nocache);
 				
 				stationDetailsSvc.getStationsTasteometer(stationNames, $scope.userDetails.lastfmUsername, $scope.stations, nocache);
-				updateStationsRecentTracks(); // Fires a timeout to re-update later
+				//updateStationsRecentTracks(); // Fires a timeout to re-update later
 			});
 		});
 

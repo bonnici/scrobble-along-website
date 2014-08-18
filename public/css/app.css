@@ -18,7 +18,7 @@ body {
 	border: 1px solid #ccc;
 	background-color: white;
 	overflow: hidden;
-	height: 186px;
+	height: 150px;
 	-moz-border-radius: 5px;
 	border-radius: 5px;
 }
@@ -43,17 +43,13 @@ body {
 	float: left;
 }
 
-.lastfm-tile .username {
-	height: 36px;
+.lastfm-tile-user .username {
+	height: 30px;
 	line-height: 15px;
 }
 
 .lastfm-tile-user .username p {
 	padding-top: 3px;
-}
-
-.lastfm-tile-station .username p {
-	padding-top: 10px;
 }
 
 .lastfm-tile .image {
@@ -73,19 +69,23 @@ body {
 
 .lastfm-tile .station-info {
 	width: 149px;
-	height: 186px;
 	float: left;
 	text-align: left;
 }
 
 .lastfm-tile .station-info .general-info {
 	text-align: center;
-	height: 32px;
-	line-height: 15px;
+	height: 50px;
+	line-height: 12px;
+}
+
+.lastfm-tile .station-info .general-info .username {
+	font-weight: bold;
 }
 
 .lastfm-tile .station-info .general-info p {
 	padding-top: 10px;
+	margin: 0;
 }
 
 .lastfm-tile .station-info .compatibility {
@@ -97,7 +97,6 @@ body {
 }
 
 .lastfm-tile .station-info .recent-tracks {
-	margin-top: 5px;
 	font-size: 10px;
 	line-height: 14px;
 	font-weight: bold;
@@ -111,7 +110,6 @@ body {
 .lastfm-tile .station-info .recent-tracks .track-row {
 	height: 30px;
 	overflow: hidden;
-	margin-top: 5px;
 	position: relative;
 }
 

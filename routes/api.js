@@ -102,12 +102,24 @@ exports.stations = function (req, res) {
 				var stations = [];
 				_.each(stationArray, function(record) {
 					if (record && record['_id'] && record['disabled'] != "true") {
-						stations.push({
+						var curStation = {
 							lastfmUsername: record['_id'],
 							stationUrl: record['stationUrl'],
 							streamUrl: record['streamUrl'],
 							lastfmProfileImage: ('profileImageUrl' in record ? record['profileImageUrl'] : null)
-						});
+						};
+
+						var recentTracks = [];
+						if ('nowPlayingArtist' in record && 'nowPlayingTrack' in record) {
+							recentTracks.push({ artist: record['nowPlayingArtist'], name: record['nowPlayingTrack'], nowPlaying: true });
+						}
+						if ('lastPlayedArtist' in record && 'lastPlayedTrack' in record) {
+							recentTracks.push({ artist: record['lastPlayedArtist'], name: record['lastPlayedTrack'], nowPlaying: false });
+						}
+
+						curStation.recentTracks = recentTracks;
+
+						stations.push(curStation);
 					}
 				});
 
