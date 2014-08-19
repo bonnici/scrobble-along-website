@@ -88,7 +88,7 @@ var cacheRespond = function(key, expires, nocache, res, callback) {
 };
 
 exports.stations = function (req, res) {
-	cacheRespond("all-stations", 12*60*60, 'nocache' in req.query, res, function(updateCallback) {
+	cacheRespond("all-stations-v2-", 20, 'nocache' in req.query, res, function(updateCallback) {
 		mongoDao.getStations(function (err, stationArray) {
 			if (err) {
 				winston.error("Error loading stations:", err);
@@ -110,10 +110,10 @@ exports.stations = function (req, res) {
 						};
 
 						var recentTracks = [];
-						if ('nowPlayingArtist' in record && 'nowPlayingTrack' in record) {
+						if ('nowPlayingArtist' in record && 'nowPlayingTrack' in record && record['nowPlayingArtist'] && record['nowPlayingTrack']) {
 							recentTracks.push({ artist: record['nowPlayingArtist'], name: record['nowPlayingTrack'], nowPlaying: true });
 						}
-						if ('lastPlayedArtist' in record && 'lastPlayedTrack' in record) {
+						if ('lastPlayedArtist' in record && 'lastPlayedTrack' in record && record['lastPlayedArtist'] && record['lastPlayedTrack']) {
 							recentTracks.push({ artist: record['lastPlayedArtist'], name: record['lastPlayedTrack'], nowPlaying: false });
 						}
 

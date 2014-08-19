@@ -41,6 +41,7 @@ angular.module('scrobbleAlong.controllers', []).
 		$scope.stations = [];
 		$scope.newScrobbleTimeout = { hours: 4, minutes: 0, inputError: false }; // Model for "change timeout time" modal
 
+		/*
 		var updateStationsRecentTracks = function() {
 			var stationNames = [];
 			angular.forEach($scope.stations, function(station) {
@@ -51,6 +52,7 @@ angular.module('scrobbleAlong.controllers', []).
 				$timeout(function() { updateStationsRecentTracks(); }, 20 * 1000);
 			});
 		};
+		*/
 
 		userDetailsSvc.getUserDbInfo(function(userDetails) {
 			if ($scope.loggedIn && (!userDetails || !userDetails.lastfmUsername)) {
@@ -80,7 +82,6 @@ angular.module('scrobbleAlong.controllers', []).
 					station.userScrobbles = userScrobbles[station.lastfmUsername] || 0;
 					station.tasteometer = null; // Initial setting so sorting works while the page is loading
 					station.currentlyScrobbling = false;
-					//station.recentTracks = null;
 
 					if (userListeningTo && station.lastfmUsername == userListeningTo) {
 						station.currentlyScrobbling = true;
@@ -88,10 +89,12 @@ angular.module('scrobbleAlong.controllers', []).
 					}
 				});
 
-				//station profile images now come from mongo 
+				// station profile images now come from mongo 
 				//stationDetailsSvc.getStationsLfmInfo(stationNames, $scope.stations, nocache);
 				
 				stationDetailsSvc.getStationsTasteometer(stationNames, $scope.userDetails.lastfmUsername, $scope.stations, nocache);
+				
+				// station recent tracks now come from mongo 
 				//updateStationsRecentTracks(); // Fires a timeout to re-update later
 			});
 		});
@@ -139,6 +142,7 @@ angular.module('scrobbleAlong.controllers', []).
 			});
 		};
 
+		// Update user details periodically (in case changes were made in another browser)
 		$interval(function() {
 			userDetailsSvc.getUserDbInfo(function(userDetails) {
 				if ($scope.loggedIn && (!userDetails || !userDetails.lastfmUsername)) {
@@ -149,6 +153,20 @@ angular.module('scrobbleAlong.controllers', []).
 				setUserDetails(userDetails);
 			});
 		}, 30 * 1000);
+
+		// Update recent tracks periodically from MongoDB
+		$interval(function() {
+			stationDetailsSvc.getAllStationsDbInfo(nocache, function(stationDbInfo) {
+				// Linear n^2 search but there aren't enough stations for this to be a problem
+				angular.forEach($scope.stations, function(station) {
+					angular.forEach(stationDbInfo, function(latestStationDetails) {
+						if (station.lastfmUsername == latestStationDetails.lastfmUsername) {
+							station.recentTracks = latestStationDetails.recentTracks;
+						}
+					});
+				});
+			});
+		}, 20 * 1000);
 
 		var setCurrentlyScrobbling = function(scrobblingStationName) {
 			$scope.userDetails.isScrobbling = false;
