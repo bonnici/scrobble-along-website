@@ -130,9 +130,3 @@ mongodb.connect(MONGO_URI, function (err, dbClient) {
 		winston.info('Express server listening on port ' + PORT);
 	});
 });
-
-/*
-todo
-store recent tracks in mongo (?)
-better UI
-*/

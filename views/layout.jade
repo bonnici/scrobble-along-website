@@ -23,7 +23,7 @@ html(lang="en", data-ng-app="scrobbleAlong")
 				div.collapse.navbar-collapse
 					ul.nav.navbar-nav.navbar-right
 						li
-							a(href='/about') About
+							a(href='/about', target="_self") About
 						li(data-ng-if='loggedIn')
 							button.btn.btn-link.navbar-btn(data-ng-click='logoutModal()') Logout
 						li(data-ng-if='!loggedIn')
