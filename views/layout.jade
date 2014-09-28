@@ -19,11 +19,11 @@ html(lang="en", data-ng-app="scrobbleAlong")
 						span.icon-bar
 						span.icon-bar
 						span.icon-bar
-					a.navbar-brand(href='/') Scrobble Along
+					a.navbar-brand(href='/', target='_self') Scrobble Along
 				div.collapse.navbar-collapse
 					ul.nav.navbar-nav.navbar-right
 						li
-							a(href='/about', target="_self") About
+							a(href='/about', target='_self') About
 						li(data-ng-if='loggedIn')
 							button.btn.btn-link.navbar-btn(data-ng-click='logoutModal()') Logout
 						li(data-ng-if='!loggedIn')
@@ -41,9 +41,9 @@ html(lang="en", data-ng-app="scrobbleAlong")
 					div.modal-body
 						p You are currently scrobbling along with a radio station, do you want to stop or keep scrobbling after you are logged out?
 					div.modal-footer
-						a.btn.btn-primary(role="button", href="/logout") Stop Scrobbling
-						a.btn.btn-primary(role="button", href="/logout?keep-scrobbling") Keep scrobbling
-						button.btn.btn-default(data-dismiss="modal") Stay Logged In
+						a.btn.btn-primary(role='button', href='/logout', target='_self') Stop Scrobbling
+						a.btn.btn-primary(role='button', href='/logout?keep-scrobbling', target='_self') Keep scrobbling
+						button.btn.btn-default(data-dismiss='modal') Stay Logged In
 
 		script(src='http://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js')
 		script(src='//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js')
