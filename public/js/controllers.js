@@ -56,7 +56,7 @@ angular.module('scrobbleAlong.controllers', []).
 
 		userDetailsSvc.getUserDbInfo(function(userDetails) {
 			if ($scope.loggedIn && (!userDetails || !userDetails.lastfmUsername)) {
-				$window.location.href = '/logout';
+				location.reload();
 				return;
 			}
 
@@ -146,7 +146,7 @@ angular.module('scrobbleAlong.controllers', []).
 		$interval(function() {
 			userDetailsSvc.getUserDbInfo(function(userDetails) {
 				if ($scope.loggedIn && (!userDetails || !userDetails.lastfmUsername)) {
-					$window.location.href = '/logout';
+					location.reload();
 					return;
 				}
 
