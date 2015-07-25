@@ -7,6 +7,11 @@ block body
 			a.close(data-dismiss='alert') ×
 			| {{ alertMessage }}
 
+		script(async, src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js")
+		ins(class="adsbygoogle", style="display:block", data-ad-client="ca-pub-4369217296754794", data-ad-slot="4369250080", data-ad-format="auto")
+		script().
+			(adsbygoogle = window.adsbygoogle || []).push({});
+
 		div.jumbotron(data-ng-if='loaded && !loggedIn')
 			h2.text-center Scrobble Along
 			p.text-center.
