@@ -21,7 +21,7 @@ angular.module('scrobbleAlong.controllers', []).
 			if ($scope.loginUrl) {
 				$window.location.href = $scope.loginUrl;
 			}
-		}
+		};
 
 		$scope.logoutModal = function() {
 			if ($scope.userDetails.isScrobbling) {
@@ -33,8 +33,8 @@ angular.module('scrobbleAlong.controllers', []).
 		};
 	}]).
 
-	controller('IndexCtrl', ['$scope', '$timeout', '$interval', '$window', '$location', 'userManagement', 'userDetails', 'stationDetails',
-		function ($scope, $timeout, $interval, $window, $location, userManagement, userDetailsSvc, stationDetailsSvc) {
+	controller('IndexCtrl', ['$scope', '$timeout', '$interval', '$window', '$location', '$cookieStore', 'userManagement', 'userDetails', 'stationDetails',
+		function ($scope, $timeout, $interval, $window, $location, $cookieStore, userManagement, userDetailsSvc, stationDetailsSvc) {
 
 		var nocache = 'nocache' in $location.search();
 			
@@ -56,6 +56,7 @@ angular.module('scrobbleAlong.controllers', []).
 
 		userDetailsSvc.getUserDbInfo(function(userDetails) {
 			if ($scope.loggedIn && (!userDetails || !userDetails.lastfmUsername)) {
+				$cookieStore.remove("lastfmSession");
 				location.reload();
 				return;
 			}
@@ -204,7 +205,10 @@ angular.module('scrobbleAlong.controllers', []).
 			if (station && station.lastfmUsername) {
 				userManagement.scrobbleAlong(station.lastfmUsername, function(err, userDetails) {
 					if (userDetails) {
-						setUserDetails(userDetails);
+						// userDetails is always object with all undefined values now - post to scrobble-along doesn't return anything
+						userDetailsSvc.getUserDbInfo(function(userDetails) {
+							setUserDetails(userDetails);
+						});
 					}
 					else {
 				        $scope.alertMessage = "Error scrobbling along, please wait a few moments and try again.";
