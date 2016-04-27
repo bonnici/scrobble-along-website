@@ -1,4 +1,44 @@
 var express = require('express');
+var path = require('path');
+var http = require('http');
+
+var PORT = process.env.PORT;
+
+if (!PORT) {
+	console.log("PORT is required");
+	process.exit(1);
+}
+
+var app = express();
+app.set('port', process.env.PORT);
+app.set('views', __dirname + '/views');
+app.set('view engine', 'jade');
+app.use(express.logger('dev'));
+app.use(express.favicon(path.join(__dirname, '/public/img/favicon.ico')));
+app.use(express.json());
+app.use(express.urlencoded());
+app.use(express.cookieParser());
+app.use(express.methodOverride());
+app.use(express.static(path.join(__dirname, 'public')));
+app.use(app.router);
+
+function redirect(req, res) {
+	res.redirect(301, 'http://scrobblealong.com');
+}
+
+app.get('/', redirect);
+app.get('/about', redirect);
+app.get('/admin', redirect);
+app.get('/login', redirect);
+app.get('/logout', redirect);
+
+// Start Server
+http.createServer(app).listen(PORT, function () {
+	console.log('Express server listening on port ' + PORT);
+});
+
+/*
+var express = require('express');
 var http = require('http');
 var path = require('path');
 var winston = require('winston');
@@ -97,11 +137,11 @@ mongodb.connect(MONGO_URI, function (err, dbClient) {
 
 	// Routes
 
-	app.get('/', pages.index);
-	app.get('/about', pages.about);
-	app.get('/admin', pages.admin);
-	app.get('/login', pages.login);
-	app.get('/logout', pages.logout);
+	app.get('/', pages.redirect);
+	app.get('/about', pages.redirect);
+	app.get('/admin', pages.redirect);
+	app.get('/login', pages.redirect);
+	app.get('/logout', pages.redirect);
 
 	// JSON API
 	app.get('/api/login-url', api.loginUrl);
@@ -130,3 +170,4 @@ mongodb.connect(MONGO_URI, function (err, dbClient) {
 		winston.info('Express server listening on port ' + PORT);
 	});
 });
+*/
