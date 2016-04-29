@@ -22,15 +22,21 @@ app.use(express.methodOverride());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(app.router);
 
+function softRedirect(req, res) {
+	res.send('<head><title>Scrobble Along</title><link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css"></head>' +
+		'<body><div class="jumbotron"><h2 class="text-center">Scrobble Along has moved!</h2><p class="text-center">Scrobble Along has moved to its (hopefully final) location at <a href="http://scrobblealong.com">http://scrobblealong.com</a>, please update your bookmarks.<br>You will be redirected in 10 seconds, but note that you will need to log in again at the new address.</p></div>' + 
+		'<script>setTimeout(function() { window.location.replace("http://scrobblealong.com"); }, 10000);</script></body>');
+}
+
 function redirect(req, res) {
 	res.redirect(301, 'http://scrobblealong.com');
 }
 
-app.get('/', redirect);
-app.get('/about', redirect);
-app.get('/admin', redirect);
-app.get('/login', redirect);
-app.get('/logout', redirect);
+app.get('/', softRedirect);
+app.get('/about', softRedirect);
+app.get('/admin', softRedirect);
+app.get('/login', softRedirect);
+app.get('/logout', softRedirect);
 
 // Start Server
 http.createServer(app).listen(PORT, function () {
