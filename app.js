@@ -1,3 +1,4 @@
+/*
 var express = require('express');
 var path = require('path');
 var http = require('http');
@@ -42,8 +43,7 @@ app.get('/logout', softRedirect);
 http.createServer(app).listen(PORT, function () {
 	console.log('Express server listening on port ' + PORT);
 });
-
-/*
+*/
 var express = require('express');
 var http = require('http');
 var path = require('path');
@@ -176,4 +176,3 @@ mongodb.connect(MONGO_URI, function (err, dbClient) {
 		winston.info('Express server listening on port ' + PORT);
 	});
 });
-*/
