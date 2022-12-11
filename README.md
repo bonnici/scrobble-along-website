@@ -12,7 +12,7 @@ This is a website that shows information about what some radio stations are play
 The site requires a few environment variables:
 * PORT: The port to run the website on
 * NODE_ENV: 'production' or 'development'
-* SA_BASE_URL: Base URL of the port (e.g. http://scrobblealong.com)
+* SA_BASE_URL: Base URL of the website
 * SA_LASTFM_API_KEY: Last.fm API key (should match scrobble-along-scrobbler)
 * SA_LASTFM_SECRET: Last.fm API secret (should match scrobble-along-scrobbler)
 * SA_USER_CRYPTO_KEY: The key to use to decrypt user information from MongoDB (should match scrobble-along-scrobbler)
